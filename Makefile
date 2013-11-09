@@ -1,5 +1,5 @@
 CC=gcc
-LIBS=-lncurses
+LIBS=-lncurses -lcurl
 CFLAGS=-std=c99
 C_FILES=$(wildcard *.c)
 
