@@ -1,7 +1,9 @@
 CC=gcc
-LIBS=-lncurses -lcurl
-CFLAGS=-std=c99
-C_FILES=$(wildcard *.c)
+LIBS=-lncurses -lcurl -lm
+CFLAGS=-std=c99 -Wall -pedantic
+C_HEADERS:=$(wildcard *.h)
+C_FILES:=$(wildcard *.c)
+C_ALL:=$(C_HEADERS) $(C_FILES)
 
-main: $(C_FILES)
-	$(CC) $(CFLAGS) $< $(LIBS)
+main:
+	$(CC) $(CFLAGS) $(C_ALL) $(LIBS)
