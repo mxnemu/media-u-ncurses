@@ -25,12 +25,18 @@ size_t CurlResult_write(void* buffer, size_t bufferSize, size_t nmemb, void* use
 	this->buffer = newBuffer;
 	this->bufferAllocated = newAllocSize;
     }
-    memcpy(this->buffer + this->bufferUsed, buffer, (bufferSize*nmemb));
+    int offset = this->bufferUsed;
+    offset = 0 == offset ? 0 : offset -1;
+    memcpy(this->buffer + offset, buffer, (bufferSize*nmemb));
     return bufferSize;
 }
 
 json_value* CurlResult_parse(struct CurlResult* this) {
-    return json_parse(this->buffer, this->bufferUsed);
+    char error[512];
+    //json_settings settings;
+    json_value* ret = json_parse_ex(NULL, this->buffer, this->bufferUsed, error);
+    printf("error: %s\n", error);
+    return ret;
 }
 
 DEFAULT_CREATE_DESTROY(CurlResult)
