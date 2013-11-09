@@ -11,7 +11,7 @@ struct CurlResult {
 
 void CurlResult_init(struct CurlResult* this);
 void CurlResult_destroyMembers(struct CurlResult* this);
-void CurlResult_write(void* buffer, size_t bufferSize, void* userdata);
+size_t CurlResult_write(void* buffer, size_t bufferSize, size_t nmemb, void* userdata);
 json_value* CurlResult_parse(struct CurlResult* this);
 
 DEFAULT_CREATE_DESTROY_H(CurlResult)
