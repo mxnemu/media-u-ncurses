@@ -1,6 +1,6 @@
 CC=gcc
 LIBS=-lncurses -lcurl -lm
-CFLAGS=-std=c99 -Wall -pedantic
+CFLAGS=-std=c99 -Wall -pedantic -g
 C_HEADERS:=$(wildcard *.h)
 C_FILES:=$(wildcard *.c)
 C_ALL:=$(C_HEADERS) $(C_FILES)
