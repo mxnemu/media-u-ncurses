@@ -1,0 +1,10 @@
+ncurses client for media-u server application
+
+required libraries:
+* libncurses5
+* libcurl4-openssl-dev
+
+build:
+* make
+
+I wrote this to have a lightweight client for the OpenPandora
