@@ -18,6 +18,7 @@ void CurlResult_write(void* buffer, size_t bufferSize, void* userdata) {
 	size_t newAllocSize = this->bufferAllocated + bufferSize;
 	char* newBuffer = malloc(newAllocSize);
 	memcpy(newBuffer, this->buffer, this->bufferUsed);
+	free(this->buffer);
 	this->buffer = newBuffer;
 	this->bufferAllocated = newAllocSize;
     }
