@@ -6,4 +6,4 @@ C_FILES:=$(wildcard *.c)
 C_ALL:=$(C_HEADERS) $(C_FILES)
 
 main:
-	$(CC) $(CFLAGS) $(C_ALL) $(LIBS)
+	$(CC) $(CFLAGS) $(C_FILES) $(LIBS)
