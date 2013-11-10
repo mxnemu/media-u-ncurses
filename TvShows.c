@@ -10,6 +10,11 @@
 void TvShows_init(struct TvShows* this) {
     this->lists = List_create();
     this->selectedList = NULL;
+    this->scrollY = 0;
+    int x, y;
+    getmaxyx(stdscr, x,y);
+    this->window = newwin(x,y, 0, 0);
+    scrollok(this->window, true);
 }
 
 void TvShows_destroyMembers(struct TvShows* this) {
@@ -34,7 +39,7 @@ void TvShows_selectDelta(struct TvShows* this, int delta) {
 	return;
     }
     struct TvShowList* list = this->selectedList->data;
-    bool inScope = TvShowList_selectDelta(list, delta);
+    bool inScope = TvShowList_selectDelta(list, this->window, delta);
     if (!inScope) {
 	if (delta > 0) {
 	    this->selectedList = this->selectedList->next;
@@ -42,6 +47,17 @@ void TvShows_selectDelta(struct TvShows* this, int delta) {
 	    this->selectedList = this->selectedList->previous;
 	}
     }
+}
+
+void TvShows_printAll(struct TvShows* this) {
+    int y = 0;
+    for (ListNode* it = this->lists->first; it; it = it->next) {
+	struct TvShowList* data = it->data;
+	if (data) {
+	    y = TvShowList_draw(data, this->window, y);
+	}
+    }
+    wrefresh(this->window);
 }
 
 void TvShows_fetch(struct TvShows* this, const char* baseUrl) {
@@ -58,6 +74,7 @@ void TvShows_fetch(struct TvShows* this, const char* baseUrl) {
     curl_easy_perform(handle);
     json_value* json = CurlResult_parse(&userdata);
     TvShows_restore(this, json);
+    TvShows_printAll(this);
 }
 
 void TvShows_restore(struct TvShows* this, json_value* json) {
@@ -85,7 +102,6 @@ void TvShows_restore(struct TvShows* this, json_value* json) {
 }
 
 void TvShows_restoreList(struct TvShows* this, const char* name, json_value* json) {
-    printw("list, %s\n", name);
     if (json->type != json_array) {
 	return;
     }
@@ -120,7 +136,6 @@ struct TvShowLi* TvShowLi_restore(json_value* json) {
 	    int strLength = value->u.string.length;
 	    li->name = malloc(sizeof(char)*strLength);
 	    strcpy(li->name, value->u.string.ptr);
-	    printw("added show %s\n", li->name);
 	} else if (0 == strcmp(key, "totalEpisodes") && value->type == json_integer) {
 	    li->totalEpisodes = value->u.integer;
 	} else if (0 == strcmp(key, "watchedEpisodes") && value->type == json_integer) {
@@ -143,18 +158,34 @@ void TvShowList_destroyMembers(struct TvShowList* this) {
 
 DEFAULT_CREATE_DESTROY(TvShowList)
 
-bool TvShowList_selectDelta(struct TvShowList* this, int delta) {
+int TvShowList_draw(struct TvShowList* this, WINDOW* window, int y) {
+    wmove(window, y, 0);
+    wprintw(window, "list %s", this->name);
+    ++y;
+    for (ListNode* it = this->lis->first; it; it = it->next) {
+	struct TvShowLi* data = it->data;
+	if (data) {
+	    wmove(window, y, 0);
+	    waddstr(window, data->name);
+	    data->y = y;
+	    ++y;
+	}
+    }
+    return y;
+}
+
+bool TvShowList_selectDelta(struct TvShowList* this, WINDOW* window, int delta) {
     if (!this->selectedLi) {
 	this->selectedLi = this->lis->first;
 	return NULL != this->selectedLi;
     }
     if (delta > 0) {
 	struct TvShowLi* li = this->selectedLi->data;
-	TvShowLi_draw(li, false);
+	TvShowLi_draw(li, window, false);
 	this->selectedLi = this->selectedLi->next;
     } else if (delta < 0) {
 	struct TvShowLi* li = this->selectedLi->data;
-	TvShowLi_draw(li, false);
+	TvShowLi_draw(li, window, false);
 	this->selectedLi = this->selectedLi->previous;
     } else {
 	return false;
@@ -162,7 +193,7 @@ bool TvShowList_selectDelta(struct TvShowList* this, int delta) {
 
     if (this->selectedLi) {
 	struct TvShowLi* li = this->selectedLi->data;
-	TvShowLi_draw(li, false);
+	TvShowLi_draw(li, window, true);
     }
 
     return NULL != this->selectedLi;
@@ -172,6 +203,7 @@ void TvShowLi_init(struct TvShowLi* this) {
     this->name = NULL;
     this->watchedEpisodes = 0;
     this->totalEpisodes = 0;
+    this->y = 0;
 }
 
 void TvShowLi_destroyMembers(struct TvShowLi* this) {
@@ -182,18 +214,20 @@ void TvShowLi_destroyMembers(struct TvShowLi* this) {
 
 DEFAULT_CREATE_DESTROY(TvShowLi)
 
-void TvShowLi_draw(struct TvShowLi* li, bool selected) {
+void TvShowLi_draw(struct TvShowLi* li, WINDOW* window, bool selected) {
     if (selected) {
-	Colors_set(Colors_Selected);
+	Colors_wset(window, Colors_Selected);
     }
     int x, y;
     getmaxyx(stdscr, x, y);
     int clearChars = x - strlen(li->name);
-    mvprintw(0,0,li->name);
+    wmove(window, li->y, 0);
+    waddstr(window, li->name);
     for (int i=0; i < clearChars; ++i) {
-	addch(' ');
+	waddch(window, ' ');
     }
     if (selected) {
-	Colors_set(Colors_Default);
+	Colors_wset(window, Colors_Default);
     }
+    wrefresh(window);
 }

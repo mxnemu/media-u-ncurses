@@ -22,7 +22,7 @@ int main(int argc, const char* argv[]) {
     }
     start_color();
     Colors_init();
-    Colors_set(Colors_Selected);
+    Colors_set(Colors_Default);
 
     // init ncurses io settings
     cbreak(); // allow ctrl-Z, ctrl-C and other default keys
