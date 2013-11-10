@@ -27,10 +27,10 @@ ListNode* List_getNodeForData(List* this, void* data);
 ListNode* ListNode_create();
 void ListNode_destroy(ListNode* this); ///< warning this does not delete data
 
-#define List_destroyWithContent(this, contentType)			\
-    ListNode* _it = this->first;						\
-    while (_it) {							\
-	contentType ## _destroy((struct contentType*)_it->data);	\
-	_it = _it->next;						\
-    }									\
+#define List_destroyWithContent(this, contentType)                      \
+    ListNode* _it = this->first;					\
+    while (_it) {                                                       \
+        contentType ## _destroy((struct contentType*)_it->data);        \
+        _it = _it->next;                                                \
+    }                                                                   \
     List_destroy(this);
