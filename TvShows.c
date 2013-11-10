@@ -5,6 +5,17 @@
 #include "TvShows.h"
 #include "CurlResult.h"
 
+
+void TvShows_init(struct TvShows* this) {
+    this->lists = List_create();
+}
+
+void TvShows_destroyMembers(struct TvShows* this) {
+    List_destroyWithContent(this->lists, TvShowList);
+}
+
+DEFAULT_CREATE_DESTROY(TvShows)
+
 void TvShows_fetch(struct TvShows* this, const char* baseUrl) {
     CURL* handle = curl_easy_init();
     struct CurlResult userdata;
@@ -93,6 +104,7 @@ struct TvShowLi* TvShowLi_restore(json_value* json) {
 
 
 void TvShowList_init(struct TvShowList* this) {
+    this->name = NULL;
     this->lis = List_create();
 }
 
@@ -109,7 +121,9 @@ void TvShowLi_init(struct TvShowLi* this) {
 }
 
 void TvShowLi_destroyMembers(struct TvShowLi* this) {
-    free(this->name);
+    if (this->name) {
+	free(this->name);
+    }
 }
 
 DEFAULT_CREATE_DESTROY(TvShowLi)

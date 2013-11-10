@@ -24,15 +24,25 @@ int main(int argc, const char* argv[]) {
     Colors_init();
     Colors_set(Colors_Selected);
 
+    // init ncurses io settings
+    cbreak(); // allow ctrl-Z, ctrl-C and other default keys
+    noecho();
+    keypad(stdscr, TRUE);
+
     printw("%s fetching lists...\n", url);
     refresh();
     
     struct TvShows shows;
+    TvShows_init(&shows);
     TvShows_fetch(&shows, url);
+    refresh();
 
-    int c = getch();
-    putchar(c);
+    int c;
+    do {
+	c = getch();
+    } while (c != 27);
+    
+    TvShows_destroyMembers(&shows);
     endwin();
-
     return 0;
 }

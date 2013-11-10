@@ -18,6 +18,10 @@ struct TvShowLi {
     int totalEpisodes;
 };
 
+void TvShows_init(struct TvShows* this);
+void TvShows_destroyMembers(struct TvShows* this);
+DEFAULT_CREATE_DESTROY_H(TvShow)
+
 void TvShows_fetch(struct TvShows* this, const char* url);
 void TvShows_restore(struct TvShows* this, json_value* json);
 void TvShows_restoreList(struct TvShows* this, const char* name, json_value* json);
