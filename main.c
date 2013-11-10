@@ -16,7 +16,7 @@ int main(int argc, const char* argv[]) {
 
     curl_global_init(CURL_GLOBAL_SSL);
     initscr();
-    printw("Hello World! %s", url);
+    printw("%s fetching lists...\n", url);
     refresh();
     
     struct TvShows shows;
