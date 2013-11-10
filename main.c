@@ -1,6 +1,7 @@
 #include <curl/curl.h>
 #include <ncurses.h>
 #include "TvShows.h"
+#include "Colors.h"
 
 int main(int argc, const char* argv[]) {
     for (int i=0; i < argc; ++i) {
@@ -20,8 +21,8 @@ int main(int argc, const char* argv[]) {
 	puts("terminal doesn't support colors\n");
     }
     start_color();
-    init_pair(1, COLOR_YELLOW, COLOR_BLACK);
-    attron(COLOR_PAIR(1));
+    Colors_init();
+    Colors_set(Colors_Selected);
 
     printw("%s fetching lists...\n", url);
     refresh();
