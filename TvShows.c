@@ -22,7 +22,9 @@ void TvShows_fetch(struct TvShows* this, const char* baseUrl) {
 }
 
 void TvShows_restore(struct TvShows* this, json_value* json) {
-    if (json->type != json_object) {
+    if (!json || json->type != json_object) {
+	printw("failed to parse json\n");
+	refresh();
 	return;
     }
     int length = json->u.object.length;
