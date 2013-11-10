@@ -1,8 +1,15 @@
 #pragma once
 #include "json.h"
+#include "List.h"
+#include "Constants.h"
 
 struct TvShows {
-    int number;
+    List* lists;
+};
+
+struct TvShowList {
+    char* name;
+    List* lis;
 };
 
 struct TvShowLi {
@@ -14,5 +21,13 @@ struct TvShowLi {
 void TvShows_fetch(struct TvShows* this, const char* url);
 void TvShows_restore(struct TvShows* this, json_value* json);
 void TvShows_restoreList(struct TvShows* this, const char* name, json_value* json);
+
+void TvShowList_init(struct TvShowList* this);
+void TvShowList_destroyMembers(struct TvShowList* this);
+DEFAULT_CREATE_DESTROY_H(TvShowList)
+
+void TvShowLi_init(struct TvShowLi* this);
+void TvShowLi_destroyMembers(struct TvShowLi* this);
+DEFAULT_CREATE_DESTROY_H(TvShowLi)
 
 struct TvShowLi* TvShowLi_restore(json_value* json);

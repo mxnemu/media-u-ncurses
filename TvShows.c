@@ -50,13 +50,21 @@ void TvShows_restoreList(struct TvShows* this, const char* name, json_value* jso
     if (json->type != json_array) {
 	return;
     }
+    struct TvShowList* list = TvShowList_create();
+    bool hasLis = false;
     int length = json->u.array.length;
     for (int i=0; i < length; ++i) {
 	json_value* value = json->u.array.values[i];
 	struct TvShowLi* li = TvShowLi_restore(value);
 	if (li) {
-	    free(li); // TODO insert into list
+	    hasLis = true;
+	    List_pushBack(list->lis, li);
 	}
+    }
+    if (hasLis) {
+	List_pushBack(this->lists, list);
+    } else {
+	free(list);
     }
 }
 
@@ -82,3 +90,26 @@ struct TvShowLi* TvShowLi_restore(json_value* json) {
     }
     return li;
 }
+
+
+void TvShowList_init(struct TvShowList* this) {
+    this->lis = List_create();
+}
+
+void TvShowList_destroyMembers(struct TvShowList* this) {
+    List_destroyWithContent(this->lis, TvShowLi);
+}
+
+DEFAULT_CREATE_DESTROY(TvShowList)
+
+void TvShowLi_init(struct TvShowLi* this) {
+    this->name = NULL;
+    this->watchedEpisodes = 0;
+    this->totalEpisodes = 0;
+}
+
+void TvShowLi_destroyMembers(struct TvShowLi* this) {
+    free(this->name);
+}
+
+DEFAULT_CREATE_DESTROY(TvShowLi)
