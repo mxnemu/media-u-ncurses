@@ -36,11 +36,15 @@ int main(int argc, const char* argv[]) {
     TvShows_init(&shows);
     TvShows_fetch(&shows, url);
     refresh();
-
-    int c;
+    
+    bool quit = false;
     do {
-	c = getch();
-    } while (c != 27);
+	int c = getch();
+	if (c == 27) {
+	    quit = true;
+	}
+	TvShows_handleInput(&shows, c);
+    } while (!quit);
     
     TvShows_destroyMembers(&shows);
     endwin();

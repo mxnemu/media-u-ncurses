@@ -4,10 +4,12 @@
 #include "json.h"
 #include "TvShows.h"
 #include "CurlResult.h"
+#include "Colors.h"
 
 
 void TvShows_init(struct TvShows* this) {
     this->lists = List_create();
+    this->selectedList = NULL;
 }
 
 void TvShows_destroyMembers(struct TvShows* this) {
@@ -15,6 +17,32 @@ void TvShows_destroyMembers(struct TvShows* this) {
 }
 
 DEFAULT_CREATE_DESTROY(TvShows)
+
+void TvShows_handleInput(struct TvShows* this, int c) {
+    if (c == 'n') {
+	TvShows_selectDelta(this, +1);
+    } else if (c == 'p') {
+	TvShows_selectDelta(this, -1);
+    } else if (c == '/') {
+	// TODO search
+    }
+}
+
+void TvShows_selectDelta(struct TvShows* this, int delta) {
+    if (!this->selectedList) {
+	this->selectedList = this->lists->first;
+	return;
+    }
+    struct TvShowList* list = this->selectedList->data;
+    bool inScope = TvShowList_selectDelta(list, delta);
+    if (!inScope) {
+	if (delta > 0) {
+	    this->selectedList = this->selectedList->next;
+	} else if (delta < 0) {
+	    this->selectedList = this->selectedList->previous;
+	}
+    }
+}
 
 void TvShows_fetch(struct TvShows* this, const char* baseUrl) {
     CURL* handle = curl_easy_init();
@@ -106,6 +134,7 @@ struct TvShowLi* TvShowLi_restore(json_value* json) {
 void TvShowList_init(struct TvShowList* this) {
     this->name = NULL;
     this->lis = List_create();
+    this->selectedLi = NULL;
 }
 
 void TvShowList_destroyMembers(struct TvShowList* this) {
@@ -113,6 +142,31 @@ void TvShowList_destroyMembers(struct TvShowList* this) {
 }
 
 DEFAULT_CREATE_DESTROY(TvShowList)
+
+bool TvShowList_selectDelta(struct TvShowList* this, int delta) {
+    if (!this->selectedLi) {
+	this->selectedLi = this->lis->first;
+	return NULL != this->selectedLi;
+    }
+    if (delta > 0) {
+	struct TvShowLi* li = this->selectedLi->data;
+	TvShowLi_draw(li, false);
+	this->selectedLi = this->selectedLi->next;
+    } else if (delta < 0) {
+	struct TvShowLi* li = this->selectedLi->data;
+	TvShowLi_draw(li, false);
+	this->selectedLi = this->selectedLi->previous;
+    } else {
+	return false;
+    }
+
+    if (this->selectedLi) {
+	struct TvShowLi* li = this->selectedLi->data;
+	TvShowLi_draw(li, false);
+    }
+
+    return NULL != this->selectedLi;
+}
 
 void TvShowLi_init(struct TvShowLi* this) {
     this->name = NULL;
@@ -127,3 +181,19 @@ void TvShowLi_destroyMembers(struct TvShowLi* this) {
 }
 
 DEFAULT_CREATE_DESTROY(TvShowLi)
+
+void TvShowLi_draw(struct TvShowLi* li, bool selected) {
+    if (selected) {
+	Colors_set(Colors_Selected);
+    }
+    int x, y;
+    getmaxyx(stdscr, x, y);
+    int clearChars = x - strlen(li->name);
+    mvprintw(0,0,li->name);
+    for (int i=0; i < clearChars; ++i) {
+	addch(' ');
+    }
+    if (selected) {
+	Colors_set(Colors_Default);
+    }
+}
