@@ -1,4 +1,5 @@
 #include <string.h>
+#include <ncurses.h>
 #include "CurlResult.h"
 
 void CurlResult_init(struct CurlResult* this) {
@@ -35,7 +36,7 @@ json_value* CurlResult_parse(struct CurlResult* this) {
     char error[512];
     //json_settings settings;
     json_value* ret = json_parse_ex(NULL, this->buffer, this->bufferUsed, error);
-    printf("error: %s\n", error);
+    printw("error: %s\n", error);
     return ret;
 }
 
