@@ -16,6 +16,13 @@ int main(int argc, const char* argv[]) {
 
     curl_global_init(CURL_GLOBAL_SSL);
     initscr();
+    if (!has_colors()) {
+	puts("terminal doesn't support colors\n");
+    }
+    start_color();
+    init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+    attron(COLOR_PAIR(1));
+
     printw("%s fetching lists...\n", url);
     refresh();
     
