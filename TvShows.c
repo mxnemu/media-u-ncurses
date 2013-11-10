@@ -29,15 +29,24 @@ void TvShows_restore(struct TvShows* this, json_value* json) {
     }
     int length = json->u.object.length;
     for (int i=0; i < length; ++i) {
-	char* name = json->u.object.values[i].name;
-	if (0 == strcmp(name, "lists")) {
-	    json_value* list = json->u.object.values[i].value;
-	    TvShows_restoreList(this, name, list);
+	char* itemName = json->u.object.values[i].name;
+	if (0 == strcmp(itemName, "lists")) {
+	    json_value* lists = json->u.object.values[i].value;
+	    if (lists->type != json_object) {
+		continue;
+	    }
+	    int listsLength = lists->u.object.length;
+	    for (int j=0; j < listsLength; ++j) {
+		char* name = lists->u.object.values[j].name;
+		json_value* list = lists->u.object.values[j].value;
+		TvShows_restoreList(this, name, list);
+	    }
 	}
     }
 }
 
 void TvShows_restoreList(struct TvShows* this, const char* name, json_value* json) {
+    printw("list, %s\n", name);
     if (json->type != json_array) {
 	return;
     }
@@ -64,6 +73,7 @@ struct TvShowLi* TvShowLi_restore(json_value* json) {
 	    int strLength = value->u.string.length;
 	    li->name = malloc(sizeof(char)*strLength);
 	    strcpy(li->name, value->u.string.ptr);
+	    printw("added show %s\n", li->name);
 	} else if (0 == strcmp(key, "totalEpisodes") && value->type == json_integer) {
 	    li->totalEpisodes = value->u.integer;
 	} else if (0 == strcmp(key, "watchedEpisodes") && value->type == json_integer) {
