@@ -35,8 +35,8 @@ size_t CurlResult_write(void* buffer, size_t charSize, size_t bufferSize, void* 
 }
 
 json_value* CurlResult_parse(struct CurlResult* this) {
-    FILE* f = fopen("jsonbuffer", "w");
-    fwrite(this->buffer, sizeof(char), this->bufferUsed, f);
+    //FILE* f = fopen("jsonbuffer", "w");
+    //fwrite(this->buffer, sizeof(char), this->bufferUsed, f);
     char error[512];
     //json_settings settings;
     json_value* ret = json_parse_ex(NULL, this->buffer, this->bufferUsed, error);
