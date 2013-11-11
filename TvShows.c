@@ -36,15 +36,23 @@ void TvShows_handleInput(struct TvShows* this, int c) {
 void TvShows_selectDelta(struct TvShows* this, int delta) {
     if (!this->selectedList) {
 	this->selectedList = this->lists->first;
-	return;
+	delta = 1;
+	if (!this->selectedList) {
+	    return;
+	}
     }
+    
     struct TvShowList* list = this->selectedList->data;
     bool inScope = TvShowList_selectDelta(list, this->window, delta);
-    if (!inScope) {
+    while (!inScope && this->selectedList) {
 	if (delta > 0) {
 	    this->selectedList = this->selectedList->next;
 	} else if (delta < 0) {
 	    this->selectedList = this->selectedList->previous;
+	}
+	if (this->selectedList) {
+	    list = this->selectedList->data;
+	    inScope = TvShowList_selectDelta(list, this->window, delta);
 	}
     }
 }
@@ -181,8 +189,18 @@ int TvShowList_draw(struct TvShowList* this, WINDOW* window, int y) {
 
 bool TvShowList_selectDelta(struct TvShowList* this, WINDOW* window, int delta) {
     if (!this->selectedLi) {
-	this->selectedLi = this->lis->first;
-	return NULL != this->selectedLi;
+	if (delta > 0) {
+	    this->selectedLi = this->lis->first;
+	} else if (delta < 0) {
+	    this->selectedLi = this->lis->last;
+	}
+
+	if (this->selectedLi) {
+	    struct TvShowLi* li = this->selectedLi->data;
+	    TvShowLi_draw(li, window, true);
+	    return true;
+	}
+	return false;
     }
     if (delta > 0) {
 	struct TvShowLi* li = this->selectedLi->data;
