@@ -75,6 +75,7 @@ void TvShows_fetch(struct TvShows* this, const char* baseUrl) {
     json_value* json = CurlResult_parse(&userdata);
     TvShows_restore(this, json);
     TvShows_printAll(this);
+    json_value_free(json);
 }
 
 void TvShows_restore(struct TvShows* this, json_value* json) {
@@ -117,6 +118,9 @@ void TvShows_restoreList(struct TvShows* this, const char* name, json_value* jso
 	}
     }
     if (hasLis) {
+	int nameLength = strlen(name);
+	list->name = malloc(sizeof(char)*nameLength);
+	strcpy(list->name, name);
 	List_pushBack(this->lists, list);
     } else {
 	free(list);
