@@ -24,9 +24,9 @@ void TvShows_destroyMembers(struct TvShows* this) {
 DEFAULT_CREATE_DESTROY(TvShows)
 
 void TvShows_handleInput(struct TvShows* this, int c) {
-    if (c == 'n') {
+    if (c == 'n' || c == KEY_DOWN) {
 	TvShows_selectDelta(this, +1);
-    } else if (c == 'p') {
+    } else if (c == 'p' || c == KEY_UP) {
 	TvShows_selectDelta(this, -1);
     } else if (c == '/') {
 	// TODO search
