@@ -130,6 +130,7 @@ void TvShows_restoreList(struct TvShows* this, const char* name, json_value* jso
 	int nameLength = strlen(name);
 	list->name = malloc(sizeof(char)*nameLength);
 	strcpy(list->name, name);
+	List_qSort(list->lis, TvShowLi_compare);
 	List_pushBack(this->lists, list);
     } else {
 	free(list);
@@ -258,4 +259,22 @@ void TvShowLi_draw(struct TvShowLi* li, WINDOW* window, bool selected) {
 	Colors_wset(window, Colors_Default);
     }
     wrefresh(window);
+}
+
+int TvShowLi_compare(void* av, void* bv) {
+    struct TvShowLi* a = av;
+    struct TvShowLi* b = bv;
+    if (!a->name && !b->name) {
+	return 0;
+    }
+    if (!a->name) {
+	return -1;
+    }
+    if (!b->name) {
+	return 1;
+    }
+    int result = strcmp(a->name, b->name);
+    return result < 0 ? -1 :
+	result > 0 ? 1 :
+	0;
 }

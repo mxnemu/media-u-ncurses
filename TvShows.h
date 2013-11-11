@@ -48,3 +48,4 @@ DEFAULT_CREATE_DESTROY_H(TvShowLi)
 
 struct TvShowLi* TvShowLi_restore(json_value* json);
 void TvShowLi_draw(struct TvShowLi* li, WINDOW* window, bool selected);
+int TvShowLi_compare(void* a, void* b);
