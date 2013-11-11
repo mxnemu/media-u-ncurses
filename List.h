@@ -23,6 +23,9 @@ void List_eraseByData(List* this, void* data);
 int List_getIndexForData(List* this, void* data);
 ListNode* List_getNodeForData(List* this, void* data);
 
+int List_length(List* this);
+void List_qSort(List* this, int (*compare)(void* a, void* b));
+void List_qSortIt(List* this, int (*compare)(void* a, void* b), ListNode* a, ListNode* b);
 
 ListNode* ListNode_create();
 void ListNode_destroy(ListNode* this); ///< warning this does not delete data

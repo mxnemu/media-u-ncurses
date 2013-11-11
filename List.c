@@ -96,3 +96,56 @@ ListNode* ListNode_create(ListNode* previous, void* data) {
 void ListNode_destroy(ListNode* this) {
     free(this);
 }
+
+int List_length(List* this) {
+    int n = 0;
+    for (ListNode* it = this->first; it; it = it->next) {
+	++n;	
+    }
+    return n;
+}
+void List_qSort(List* this, int (*compare)(void* a, void* b)) {
+    ListNode* a = this->first;
+    ListNode* b = this->last;
+    if (a && b) {
+	List_qSortIt(this, compare, a, b);
+    }
+}
+
+void List_qSortIt(List* this, int (*compare)(void* a, void* b), ListNode* start, ListNode* end) {
+    if (start == end) {
+	return;
+    }
+    ListNode* it = start;
+    ListNode* jt = end->previous ? end->previous : it; // skip the while hack
+    void* pivot = end->data;
+
+    while (it != jt) {
+	while (1 != compare(it->data, pivot) && it != jt) {
+	    it = it->next;
+	}
+	    
+	while (-1 != compare(jt->data, pivot) && jt != it) {
+	    jt = jt->previous;
+	}
+	    
+	if (it != jt) {
+	    void* swapCache = it->data;
+	    it->data = jt->data;
+	    jt->data = swapCache;
+	}
+    }
+	
+    if (1 == compare(it->data, pivot)) {
+	void* swapCache = it->data;
+	it->data = end->data;
+	end->data = swapCache;
+    }
+	
+    if (it->previous && start != it) {
+	List_qSortIt(this, compare, start, it->previous);
+    }
+    if (it->next && end != it) {
+	List_qSortIt(this, compare, it->next, end);
+    }
+}
