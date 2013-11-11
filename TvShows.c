@@ -172,7 +172,9 @@ void TvShowList_destroyMembers(struct TvShowList* this) {
 DEFAULT_CREATE_DESTROY(TvShowList)
 
 int TvShowList_draw(struct TvShowList* this, WINDOW* window, int y) {
-    ++y;
+    if (y > 0) {
+	++y;
+    }
     wmove(window, y, 0);
     wattron(window, A_UNDERLINE);
     wprintw(window, "list %s", this->name);
