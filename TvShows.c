@@ -76,6 +76,7 @@ void TvShows_fetch(struct TvShows* this, const char* baseUrl) {
     TvShows_restore(this, json);
     TvShows_printAll(this);
     json_value_free(json);
+    CurlResult_destroyMembers(&userdata);
 }
 
 void TvShows_restore(struct TvShows* this, json_value* json) {
