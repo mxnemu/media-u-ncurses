@@ -7,3 +7,6 @@ C_ALL:=$(C_HEADERS) $(C_FILES)
 
 main:
 	$(CC) $(CFLAGS) $(C_FILES) $(LIBS)
+
+test:
+	$(CC) $(CFLAGS) List.c StringReplace.c tests/StringReplaceTest.c $(LIBS)
