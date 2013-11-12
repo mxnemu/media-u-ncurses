@@ -6,7 +6,7 @@ C_FILES:=$(wildcard *.c)
 C_ALL:=$(C_HEADERS) $(C_FILES)
 
 main:
-	$(CC) $(CFLAGS) $(C_FILES) $(LIBS)
+	$(CC) $(CFLAGS) $(C_FILES) $(LIBS) -o $@
 
 test:
-	$(CC) $(CFLAGS) List.c StringReplace.c tests/StringReplaceTest.c $(LIBS)
+	$(CC) $(CFLAGS) List.c StringReplace.c tests/StringReplaceTest.c $(LIBS) -o $@
