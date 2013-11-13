@@ -1,6 +1,6 @@
 roadmap:
 play selected item ('RET')
-     fetch eplist, sort, arrange playlist, convert to json, encode url
+     convert to json, encode url
 scrolling view on tvshowlist
      set window height > maxY, shift the window position
      alt -> use default scrolling functions (didn't figure them out yet)

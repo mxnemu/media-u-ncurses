@@ -8,6 +8,7 @@ struct TvShows {
     ListNode* selectedList;
     int scrollY;
     WINDOW* window;
+    const char* baseUrl;
 };
 
 struct TvShowList {
@@ -30,6 +31,8 @@ DEFAULT_CREATE_DESTROY_H(TvShow)
 void TvShows_printAll(struct TvShows* this);
 void TvShows_handleInput(struct TvShows* this, int c);
 void TvShows_selectDelta(struct TvShows* this, int delta);
+void TvShows_playSelected(struct TvShows* this);
+struct TvShowLi* TvShows_selectedTvShow(struct TvShows* this);
 
 void TvShows_fetch(struct TvShows* this, const char* url);
 void TvShows_restore(struct TvShows* this, json_value* json);

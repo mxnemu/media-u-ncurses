@@ -5,6 +5,7 @@
 #include "TvShows.h"
 #include "CurlResult.h"
 #include "Colors.h"
+#include "EpisodeList.h"
 
 
 void TvShows_init(struct TvShows* this) {
@@ -30,7 +31,26 @@ void TvShows_handleInput(struct TvShows* this, int c) {
 	TvShows_selectDelta(this, -1);
     } else if (c == '/') {
 	// TODO search
+    } else if (c == KEY_ENTER) {
+	TvShows_playSelected(this);
     }
+}
+
+void TvShows_playSelected(struct TvShows* this) {
+    struct TvShowLi* tvShow = TvShows_selectedTvShow(this);
+    if (!tvShow) {
+	return;
+    }
+    const char* name = tvShow->name;
+    struct EpisodeList* episodeList = EpisodeList_fetch(this->baseUrl, name);
+    EpisodeList_play(episodeList, this->baseUrl);
+}
+
+struct TvShowLi* TvShows_selectedTvShow(struct TvShows* this) {
+    if (!this->selectedList) return NULL;
+    struct TvShowList* list = this->selectedList->data;
+    if (!list->selectedLi) return NULL;
+    return list->selectedLi->data;
 }
 
 void TvShows_selectDelta(struct TvShows* this, int delta) {
@@ -83,6 +103,7 @@ void TvShows_fetch(struct TvShows* this, const char* baseUrl) {
     json_value* json = CurlResult_parse(&userdata);
     TvShows_restore(this, json);
     TvShows_printAll(this);
+    this->baseUrl = baseUrl;
     json_value_free(json);
     CurlResult_destroyMembers(&userdata);
 }
@@ -127,8 +148,8 @@ void TvShows_restoreList(struct TvShows* this, const char* name, json_value* jso
 	}
     }
     if (hasLis) {
-	int nameLength = strlen(name);
-	list->name = malloc(sizeof(char)*nameLength);
+        size_t nameLength = strlen(name) + 1;
+	list->name = malloc(sizeof(char) * nameLength);
 	strcpy(list->name, name);
 	List_qSort(list->lis, TvShowLi_compare);
 	List_pushBack(this->lists, list);
