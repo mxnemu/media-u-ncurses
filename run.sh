@@ -1,0 +1,1 @@
+LD_LIBRARY_PATH=./jansson/src/.libs/:LD_LIBRARY_PATH gdb ./bin/main

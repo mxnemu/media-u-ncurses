@@ -1,6 +1,7 @@
 CC=gcc
 LIBS=-lncurses -lcurl -lm -ljansson
 LIB_DIRS:=-L$(CURDIR)/jansson/src/.libs/
+INCLUDE_DIRS:=-I$(CURDIR)/jansson/src
 CFLAGS=-std=c99 -Wall -pedantic -g
 C_HEADERS:=$(wildcard *.h)
 C_FILES:=$(wildcard *.c)
@@ -11,7 +12,7 @@ MKDIR=mkdir -p
 BIN_DIR=bin
 
 main: prepareDir
-	$(CC) $(CFLAGS) $(C_FILES) $(LIBS) $(LIB_DIRS) -o $(BIN_DIR)/$@
+	$(CC) $(CFLAGS) $(C_FILES) $(LIBS) $(LIB_DIRS) $(INCLUDE_DIRS) -o $(BIN_DIR)/$@
 
 test:
 	$(CC) $(CFLAGS) List.c StringReplace.c tests/StringReplaceTest.c $(LIBS) -o $(BIN_DIR)/$@

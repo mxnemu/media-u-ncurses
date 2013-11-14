@@ -1,9 +1,12 @@
 #include "StringReplace.h"
 #include "EpisodeList.h"
 #include "CurlResult.h"
+#include "EpisodeListToJson.h"
+#include "urlcode.h"
 #include <string.h>
 #include <stdio.h>
 #include <curl/curl.h>
+#include <ncurses.h>
 
 void EpisodeList_init(struct EpisodeList* this) {
     this->episodes = List_create();
@@ -15,7 +18,7 @@ DEFAULT_CREATE_DESTROY(EpisodeList)
 
 struct EpisodeList* EpisodeList_fetch(const char* baseurl, const char* tvShow) {
     char url[512];
-    char* escapedTvShow = replaceStr(tvShow, " ", "%20");
+    char* escapedTvShow = url_encode(tvShow);
     sprintf(url, "%s/api/library/tvShowDetails?%s", baseurl, escapedTvShow);
 
     CURL* handle = curl_easy_init();
@@ -75,8 +78,8 @@ void EpisodeList_play(struct EpisodeList* this, const char* baseUrl) {
     if (!playList) {
 	return;
     }
-    /* TODO build json array
-    char* jsonResponse;
+
+    char* jsonResponse = EpisodeList_toJsonString(playList);
 
     
     char url[1024*1024];
@@ -90,9 +93,10 @@ void EpisodeList_play(struct EpisodeList* this, const char* baseUrl) {
     curl_easy_setopt(handle, CURLOPT_WRITEDATA, &userdata);
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, CurlResult_write);
     curl_easy_perform(handle);
-    json_value* json = CurlResult_parse(&userdata);
+    //    json_value* json = CurlResult_parse(&userdata);
+    printw(userdata.buffer);
     CurlResult_destroyMembers(&userdata);
-    */
+
 }
 
 void Episode_init(struct Episode* this) {
