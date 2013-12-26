@@ -54,30 +54,31 @@ struct TvShowLi* TvShows_selectedTvShow(struct TvShows* this) {
 }
 
 void TvShows_selectDelta(struct TvShows* this, int delta) {
+
     if (!this->selectedList) {
-	this->selectedList = this->lists->first;
-	delta = 1;
-	if (!this->selectedList) {
-	    return;
-	}
+    	this->selectedList = this->lists->first;
+    	delta = 1;
+    	if (!this->selectedList) {
+    	    return;
+    	}
     }
-    
+
     struct TvShowList* list = this->selectedList->data;
     bool inScope = TvShowList_selectDelta(list, this->window, delta);
     while (!inScope && this->selectedList) {
-	if (delta > 0) {
-	    this->selectedList = this->selectedList->next;
-	} else if (delta < 0) {
-	    this->selectedList = this->selectedList->previous;
-	}
-	if (this->selectedList) {
-	    list = this->selectedList->data;
-	    inScope = TvShowList_selectDelta(list, this->window, delta);
-	}
+    	if (delta > 0) {
+    	    this->selectedList = this->selectedList->next;
+    	} else if (delta < 0) {
+    	    this->selectedList = this->selectedList->previous;
+    	}
+    	if (this->selectedList) {
+    	    list = this->selectedList->data;
+    	    inScope = TvShowList_selectDelta(list, this->window, delta);
+    	}
     }
 }
 
-void TvShows_printAll(struct TvShows* this) {
+int TvShows_printAll(struct TvShows* this) {
     int y = 0;
     for (ListNode* it = this->lists->first; it; it = it->next) {
 	struct TvShowList* data = it->data;
@@ -85,7 +86,10 @@ void TvShows_printAll(struct TvShows* this) {
 	    y = TvShowList_draw(data, this->window, y);
 	}
     }
-    wrefresh(this->window);
+    if (this->window) {
+        wrefresh(this->window);
+    }
+    return y;
 }
 
 void TvShows_fetch(struct TvShows* this, const char* baseUrl) {
@@ -102,10 +106,21 @@ void TvShows_fetch(struct TvShows* this, const char* baseUrl) {
     curl_easy_perform(handle);
     json_value* json = CurlResult_parse(&userdata);
     TvShows_restore(this, json);
+    TvShows_recreateWindowForData(this);
     TvShows_printAll(this);
     this->baseUrl = baseUrl;
     json_value_free(json);
     CurlResult_destroyMembers(&userdata);
+}
+
+void TvShows_recreateWindowForData(struct TvShows* this) {
+    if (this->window) {
+        delwin(this->window);
+    }
+    this->window = NULL;
+    int y = TvShows_printAll(this);
+    int x = getmaxx(stdscr);
+    this->window = newwin(y, x, 0, 0);
 }
 
 void TvShows_restore(struct TvShows* this, json_value* json) {
@@ -197,17 +212,21 @@ int TvShowList_draw(struct TvShowList* this, WINDOW* window, int y) {
     if (y > 0) {
 	++y;
     }
-    wmove(window, y, 0);
-    wattron(window, A_UNDERLINE);
-    wprintw(window, "list %s", this->name);
-    wattroff(window, A_UNDERLINE);
+    if (window) {
+        wmove(window, y, 0);
+        wattron(window, A_UNDERLINE);
+        wprintw(window, "list %s", this->name);
+        wattroff(window, A_UNDERLINE);
+    }
     ++y;
     for (ListNode* it = this->lis->first; it; it = it->next) {
 	struct TvShowLi* data = it->data;
 	if (data) {
-	    wmove(window, y, 0);
-	    waddstr(window, data->name);
-	    data->y = y;
+            if (window) {
+                wmove(window, y, 0);
+                waddstr(window, data->name);
+            }
+            data->y = y;
 	    ++y;
 	}
     }
@@ -268,9 +287,10 @@ void TvShowLi_draw(struct TvShowLi* li, WINDOW* window, bool selected) {
     if (selected) {
 	Colors_wset(window, Colors_Selected);
     }
-    int x, y;
-    getmaxyx(stdscr, x, y);
+    int x = getmaxx(stdscr);
     int clearChars = x - strlen(li->name);
+    /* wscrl(window, -li->y); */
+    /* wscrl(window, li->y); */
     wmove(window, li->y, 0);
     waddstr(window, li->name);
     for (int i=0; i < clearChars; ++i) {
@@ -279,6 +299,7 @@ void TvShowLi_draw(struct TvShowLi* li, WINDOW* window, bool selected) {
     if (selected) {
 	Colors_wset(window, Colors_Default);
     }
+    wmove(window, li->y, 0);
     wrefresh(window);
 }
 

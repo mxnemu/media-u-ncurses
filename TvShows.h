@@ -28,7 +28,8 @@ void TvShows_init(struct TvShows* this);
 void TvShows_destroyMembers(struct TvShows* this);
 DEFAULT_CREATE_DESTROY_H(TvShow)
 
-void TvShows_printAll(struct TvShows* this);
+void TvShows_recreateWindowForData(struct TvShows* this);
+int TvShows_printAll(struct TvShows* this);
 void TvShows_handleInput(struct TvShows* this, int c);
 void TvShows_selectDelta(struct TvShows* this, int delta);
 void TvShows_playSelected(struct TvShows* this);
