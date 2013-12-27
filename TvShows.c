@@ -118,9 +118,12 @@ void TvShows_recreateWindowForData(struct TvShows* this) {
         delwin(this->window);
     }
     this->window = NULL;
-    int y = TvShows_printAll(this);
-    int x = getmaxx(stdscr);
-    this->window = newwin(y, x, 0, 0);
+    int y = TvShows_printAll(this) + 1;
+    int screenX, screenY;
+    getmaxyx(stdscr, screenY, screenX);
+    this->window = newwin(y, screenX, 0, 0);
+    scrollok(this->window, true);
+    wsetscrreg(this->window, 0, screenY);
 }
 
 void TvShows_restore(struct TvShows* this, json_value* json) {
@@ -284,14 +287,13 @@ void TvShowLi_destroyMembers(struct TvShowLi* this) {
 DEFAULT_CREATE_DESTROY(TvShowLi)
 
 void TvShowLi_draw(struct TvShowLi* li, WINDOW* window, bool selected) {
+    wmove(window, li->y, 0);
     if (selected) {
 	Colors_wset(window, Colors_Selected);
     }
-    int x = getmaxx(stdscr);
+    int x = getmaxx(window);
     int clearChars = x - strlen(li->name);
     /* wscrl(window, -li->y); */
-    /* wscrl(window, li->y); */
-    wmove(window, li->y, 0);
     waddstr(window, li->name);
     for (int i=0; i < clearChars; ++i) {
 	waddch(window, ' ');
